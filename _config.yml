@@ -1,7 +1,7 @@
 lsi: false
-hilighter: pygments
+hilighter: rogue
 source: .
-exclude: ["lib", "Capfile", "Gemfile", "config", "log", "tmp", "CNAME", "README.md"]
+exclude: ["vendor", "lib", "Capfile", "Gemfile", "config", "log", "tmp", "CNAME", "README.md"]
 destination: public
 description: Addumb.com. It's just a crappy personal site. nbd. Move along.
 permalink: /:year/:month/:day/:title/
