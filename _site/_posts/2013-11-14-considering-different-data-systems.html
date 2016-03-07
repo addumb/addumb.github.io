@@ -1,0 +1,33 @@
+---
+layout: post
+title: Considering different data systems?
+date: 2013-11-14 17:13:43.000000000 -08:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>Please feel free to agree or disagree. I'm likely downright wrong about a fair amount of this...</p>
+<h1>CAP</h1>
+<div>The first very high-level consideration is where would you like to sit on the CAP tradeoffs? Consistency across the entire dataset has some pretty stringent requirements. Availability of the dataset was traditionally thought of as a binary concept: is the DB up or down? But in these consumer internet days, it sometimes makes things a lot more relaxed if you allow yourself to have partial availability in your datasets, e.g. users hashing to ^0.* through ^4.* are down, or users hashing to 5 thru 9 are still OK. The partition tolerance part is where things get downright crazy... I'll try to get into some of those more awesomer and recent tradeoffs shortly and poorly.</div>
+<div></div>
+<div>CA: Highly consistent and available data has no (network) partition tolerance. Another way to say this is you have a single master which you failover when it dies. This is a very familiar situation for traditional DBAs and people who can afford Oracle :)</div>
+<div></div>
+<div>AP: Highly available and partition-tolerant systems have high consistency costs. A typical setup here is offline processing: you have a place that accepts new writes, but nobody can read them until you copy out the data to <b>all</b> servers. That is strictly all servers, not "each server."</div>
+<div></div>
+<div>CP: Highly consistent and partition-tolerant systems have low availability, per their trade-off. An example here is actually zookeeper :) If you tried to use zookeeper as a general purpose datastore, you will notice very low "availability." As in your write latencies can approach infinity, which is indistinguishable from the service being down.</div>
+<div></div>
+<div>People usually end up picking something in-between these 3 wonky states.</div>
+<h1>Sharding</h1>
+<div>Extremely broadly, "sharding" is the process of dividing your dataset into smaller pieces (shards) each potentially available on a different computer. It's a way to compromize some consistency for partition tolerance. You get the additional benefit of giving you availabilities between "yes" and "no." The typical way to start sharding is to take an incoming piece of data from the system's input (a username, e.g.) and run it through a hashing function and designating ranges in the hashing function output to be served by different shards.</div>
+<div></div>
+<div>One of the biggest under-stated assumptions of sharding is that the key of data you are hashing on is an equally-valued range. If, for example, your company is a ticket-sales company, you probably see each individual ticket sold as roughly as unimportant as the next. A <strong>terrible</strong> key to shard on would be the event the tickets are for. Why would the ticket be good and the event be bad? In a shard failure event (partition or availability gone), you will lose acess to a specific percentage of your keys. If you keyed on event and the Superbowl happened to be one of those keys, you are going to lose a LOT of money. If you keyed on ticket, you will lose access to a specific percentage of tickets for all events, but you will <em>retain access</em> to many tickets for the Superbowl! The take-away here is to <b>over-shard</b> so that your unit of failure is small and to <strong>shard on equal business value data</strong>.</div>
+<div></div>
+<div><span style="line-height:1.5;">So now that you know what you wish you could shard on, look back to the product and try to find what I call a natrually ocurring key that's close to it. An example is you want to shard on user_id which is an integer you create, but users keep entering their username! The fix is to hash on the username (which you receive in the POST) to make lookups O(1) instead of O(your user_id lookup stack) as the userbase grows.</span></div>

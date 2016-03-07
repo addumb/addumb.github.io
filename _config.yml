@@ -1,0 +1,7 @@
+lsi: false
+hilighter: pygments
+permalink: /:title
+exclude: ["lib", "Capfile", "Gemfile", "config", "log", "tmp", "CNAME", "README.md"]
+destination: public
+source: _site
+description: Addumb.com. It's just a crappy personal site. nbd. Move along.

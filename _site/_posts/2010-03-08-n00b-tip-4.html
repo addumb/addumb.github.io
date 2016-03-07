@@ -1,0 +1,21 @@
+---
+layout: post
+title: Linux tip 4 - bash history timestamps
+date: 2010-03-08 11:24:11.000000000 -08:00
+type: post
+published: true
+status: publish
+categories:
+- Tech
+- Tip
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>Bash history can be a lifesaver, but when you need it, you usually also need to know <strong>when</strong> the commands were run. To do this, put the following line in your <em>~/.bashrc</em><br />
+<code>export HISTTIMEFORMAT="[%x %X] "</code><br />
+This tells bash to prepend lines to .bash_history with the timestamp (commented) so when you run <em>history</em>, the timestamps get pulled in alongside the commands.</p>

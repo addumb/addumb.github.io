@@ -1,0 +1,24 @@
+---
+layout: post
+title: MySQL Duplicate Key Error - InnoDB or MyISAM?
+date: 2011-01-20 15:53:18.000000000 -08:00
+type: post
+published: true
+status: publish
+categories:
+- Tech
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>When bringing up a new MySQL slave, I did the ol' mysqldump route for a change. The command usually goes something like this:<br />
+<code><br />
+master-host $ mysqldump -uroot -p --quick --compact --all-databases | gzip | ssh -cblowfish slave-host "gunzip &gt; dump.sql"<br />
+slave-host $ mysql &lt; dump.sql<br />
+</code><br />
+But I kept getting duplicate key errors on import! Graaaaaaah! They only seemed to happen when there were multi-byte characters in the varchar column... suspicious. Let's SHOW CREATE TABLE on both. Ah HA! Master is InnoDB, slave is MyISAM. Thanks, mysqldump. So... well the tables are not created using the same storage engine! mysqldump just decided that everything should be MyISAM which has a key length limitation different than InnoDB.</p>
+<p>I'm by no means the first person to run into this, I'm just tossing it out there as well. See <a title="http://mmatemate.blogspot.com/2011/01/about-innodb-index-size-limitations.html" href="http://mmatemate.blogspot.com/2011/01/about-innodb-index-size-limitations.html" target="_blank">http://mmatemate.blogspot.com/2011/01/about-innodb-index-size-limitations.html</a> for a similar adventure.</p>

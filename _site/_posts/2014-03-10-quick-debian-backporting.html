@@ -1,0 +1,71 @@
+---
+layout: post
+title: Quick Debian Backporting
+date: 2014-03-10 13:41:22.000000000 -07:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<h2>Backporting</h2>
+<p>Suppose you're running Ubuntu and want to get a newer version of a package than what's provided by Ubuntu. The process of re-building a newer version of a package from a newer version of the Distro is called "backporting." This can become <em>very dangerous</em> if you start backporting highly-dependent packages like python, so just don't do that. Try to keep to the leaves of your distro's dependency tree.</p>
+<h2>Example</h2>
+<p>As a specific example, I run Ubuntu 12.04 ("precise"), which comes with <code>nose</code> version 1.1.2-3, but I want something newer so that I can use the <code>--cover-xml</code> option! This option was introduced at <a href="https://github.com/nose-devs/nose/commit/868ce889f1b6cf6423fdd56fbc90058c2f4895d8" target="_blank">https://github.com/nose-devs/nose/commit/868ce889f1b6cf6423fdd56fbc90058c2f4895d8</a> and first released in 1.2.</p>
+<p>I want to backport <code>nose &gt;= 1.2</code> to Ubuntu Precise.</p>
+<h2>Do This</h2>
+<ul>
+<li>Go to <a href="http://packages.ubuntu.com/source/precise/nose" target="_blank">http://packages.ubuntu.com/source/precise/nose</a> and click through the different versions of Ubuntu on the top right until a version we want is there.</li>
+<li><a href="http://packages.ubuntu.com/source/saucy/nose" target="_blank">Saucy has nose 1.3.0</a>, so I'll use that!</li>
+<li>Copy the URL to the .dsc file under the "Download Nose" section: <code>http://archive.ubuntu.com/ubuntu/pool/main/n/nose/nose_1.3.0-2.dsc</code></li>
+<li><code>sudo apt-get install devscripts pbuilder</code></li>
+<li><code>sudo pbuilder --create --distribution precise</code></li>
+<li>Get some coffee, this will take a while.</li>
+<li><code>dget http://archive.ubuntu.com/ubuntu/pool/main/n/nose/nose_1.3.0-2.dsc</code></li>
+<li><code>sudo pbuilder --build --distribution precise nose_1.3.0-2.dsc</code></li>
+</ul>
+<p>If all went well, you should now have some .deb files in /var/cache/builder/result!</p>
+<p>If you're like me and everything did NOT go well because you tried this in a VM with only 512MB RAM, you probably got some test failures like this:<br />
+<code><br />
+======================================================================<br />
+FAIL: Doctest: test_issue270.rst<br />
+----------------------------------------------------------------------<br />
+Traceback (most recent call last):<br />
+File "/usr/lib/python3.2/doctest.py", line 2153, in runTest<br />
+raise self.failureException(self.format_failure(new.getvalue()))<br />
+AssertionError: Failed doctest test for test_issue270.rst<br />
+File "/tmp/buildd/nose-1.3.0/build/tests/unit_tests/test_issue270.rst", line 0<br />
+----------------------------------------------------------------------<br />
+File "/tmp/buildd/nose-1.3.0/build/tests/unit_tests/test_issue270.rst", line 17, in test_issue270.rst<br />
+Failed example:<br />
+run(argv=argv, plugins=[MultiProcess()])<br />
+Exception raised:<br />
+Traceback (most recent call last):<br />
+File "/usr/lib/python3.2/doctest.py", line 1288, in __run<br />
+compileflags, 1), test.globs)<br />
+File "", line 1, in<br />
+run(argv=argv, plugins=[MultiProcess()])<br />
+File "/tmp/buildd/nose-1.3.0/build/tests/nose/plugins/plugintest.py", line 412, in run_buffered<br />
+run(*arg, **kw)<br />
+File "/tmp/buildd/nose-1.3.0/build/tests/nose/plugins/plugintest.py", line 372, in run<br />
+buffer = Buffer()<br />
+File "/tmp/buildd/nose-1.3.0/build/tests/nose/plugins/plugintest.py", line 130, in __init__<br />
+self.__queue = Manager().Queue()<br />
+File "/usr/lib/python3.2/multiprocessing/__init__.py", line 98, in Manager<br />
+m.start()<br />
+File "/usr/lib/python3.2/multiprocessing/managers.py", line 527, in start<br />
+self._process.start()<br />
+File "/usr/lib/python3.2/multiprocessing/process.py", line 132, in start<br />
+self._popen = Popen(self)<br />
+File "/usr/lib/python3.2/multiprocessing/forking.py", line 121, in __init__<br />
+self.pid = os.fork()<br />
+OSError: [Errno 12] Cannot allocate memory</code></p>
+<p>----------------------------------------------------------------------</p>
+<p><span style="font-size:1.5em;line-height:1.5em;">Warning!</span></p>
+<p>You should be very careful when installing them since they are unvalidated backports and may break things unexpectedly. Keeping to dependency tree leaves is one way to mitigate this, since nothing in the distro itself depends them. <em>It is then up to you</em> to make sure any software you use works nicely with the backported software. This is not limited just .debs, but could be Python applications, production services, or even just some scripts you whipped up and forgot about until you need them to bring the site back up.</p>

@@ -1,0 +1,27 @@
+---
+layout: post
+title: Linux tip 3 - rsync gotchas
+date: 2009-10-21 18:46:35.000000000 -07:00
+type: post
+published: true
+status: publish
+categories:
+- Tech
+- Tip
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>Use rsync a lot? Do you use it just infrequently enough to have to check the man page every time? Me too. I always have trouble with out it interprets trailing slashes on paths.</p>
+<ol>
+<li>Copy entire directory to remote parent directory:<br />
+<code>rsync /path/without/slash host:/path/to/parent/with/slash/</code></li>
+<li>Copy contents of one directory to another:<br />
+<code>rsync -r /path/to/directory/* host:/path/to/directory/</code></li>
+<li>Copy a directory into a <b>new</b> directory on another host:<br />
+<code>rsync /path/without/slash host:/path/to/new/directory</code></li>
+<p>One more thing, I almost always use -aP, but for some high-latency connections you'll probably also want to pass -z for compressing the stream.</ol>

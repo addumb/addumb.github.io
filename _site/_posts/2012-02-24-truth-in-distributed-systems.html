@@ -1,0 +1,27 @@
+---
+layout: post
+title: Truth In Distributed Systems
+date: 2012-02-24 14:14:33.000000000 -08:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>I need to write a distributed computer systems post about the concept of "truth."</p>
+<p>The gist of it goes like this: Suppose you have a group of servers (A) that need data from another group of servers (B). Each member of A could talk to whichever member of B it likes. Thing is, each member of A could see a member of B fail independently. How should the other members of A know if that member of B failed? The truth of the matter is that a member of B failed... we can get into arguments about "How dead is it?" but suffice it to say you no longer want to consider it a valid member of B.</p>
+<p>There are a few ways to prevent other members of A from talking to the failed member of B, that I can see:</p>
+<ul>
+<li>Send traffic through a bottleneck that determines health of B (a load balancer pair, e.g.)</li>
+<li>Have the members of A tell each other about the failure</li>
+<li>Don't ;)</li>
+</ul>
+<p>So... thing is truth is relative in this situation. We have servers derp1 and derp2 are members of the client pool A and they are both trying to talk to herp1, a member of B. derp1 and derp2 can independently decide herp1 is dead. The event where derp1 discovers herp1 is dead is separate from the event when derp2 discovers herp1 is dead. It will take a non-zero amount of time for that information to go anywhere. In this situation, the bottleneck or load balancer is going through this same process, it's just been deigned Arbiter of Health of Pool B.</p>
+<p>It is not an option to have all members of pool A know immediately when herp1 fails, thanks to special relativity. The time it takes to inform all members of A increases with the size of A.</p>
+<p>I prefer to deal with this sort of truth-y information retrieval (e.g. "What are my options for getting data out of B right now?") as a trade-off between immediate single-point knowledge on one side and eventual distributed quorum on the other side. It's mostly a matter of how long you can wait to get "good" information out of pool B. If you need it RIGHT NOW, then you'll need to go through an aggregation point like a load balancer. If you can deal with some "stale" or "bad" responses, then you should relax your requirements and let the clients work it out amongst themselves.</p>

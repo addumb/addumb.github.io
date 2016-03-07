@@ -1,0 +1,51 @@
+---
+layout: post
+title: 'Linux Tip: awesome and synergy for less mouse/keyboard switching'
+date: 2011-01-12 13:52:59.000000000 -08:00
+type: post
+published: true
+status: publish
+categories:
+- Tech
+- Tip
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>I use a desktop plus a laptop at work. My desktop is running Ubuntu, and my laptop is running OS X (MacBook Pro). I started to use <a href="http://synergy-foss.org/">synergy</a> right off the bat. Eventually I got tired of having to move my mouse across the screens to change the focus, so I added this to my ~/.synergy.conf:<br />
+<code><br />
+section: options<br />
+keystroke(alt+super+l) = switchInDirection(right)<br />
+keystroke(alt+super+h) = switchInDirection(left)<br />
+end<br />
+</code><br />
+And I was happy for a while! I started to use <a href="http://www.tenshu.net/terminator/">terminator</a> because I always had 4+ gnome-terminal sessions open at once and wanted to see them all (tabs only took me so far). Sad thing is, I could never get the terminator navigation keys to work predictably. If I had 4 terminals open at once, alt+direction never behaved how I expected.</p>
+<p>So I gave a tiling window manager a try: <a href="http://awesome.naquadah.org/">awesome</a>. It's... well it's awesome. It gets REALLY weird if you have a bunch of modal windows though, so be careful running Ubuntu's update manager or such.</p>
+<p>But there was a problem! I have two monitors on my desktop, which awesome understands as two screens. Perfect! That's what I hoped for. Switching back and forth between the screens with mod4+control+j or k moves the mouse cursor to 0,0 (top left corner) of each screen. Synergy interprets that as its cue to switch screens, so when I move to 0,0 on my left monitor, synergy moves the focus over to my laptop (to the left of both monitors). Crap. Then I have to hit mod4+alt+l (that's L) to get to my desktop again, so I could never easily move from my right monitor back to my left monitor because it would always trip over to my laptop (leftmost screen).</p>
+<p>The was super simple, though. Found it in a mailing list, of course. Add this to ~/.synergy.conf:<br />
+<code><br />
+section: options<br />
+switchCorners = top-left<br />
+switchCornerSize = 2<br />
+end<br />
+</code><br />
+That makes synergy not switch screens when the mouse is over a two-pixel cross in the top-left corner. Now I can switch screens within awesome and within synergy! So much less mouse needed!</p>
+<p>Update: How do you set up awesome and synergy? Oh, glad you asked! I'm running Ubuntu 10.something-ish, so I did this to set up awesome:<br />
+<code><br />
+$ sudo apt-get install awesome<br />
+$ gnome-session-properties<br />
+</code><br />
+Then:</p>
+<ol>
+<li>Uncheck your window manager (metacity or compiz?)</li>
+<li>Click Add</li>
+<li>Enter "awesome" or really anything you like for the Name</li>
+<li>Enter "awesome" for the Command</li>
+<li>Optionally fill in a comment</li>
+<li>Click Add</li>
+<li>Log out and back in!</li>
+</ol>

@@ -1,0 +1,69 @@
+---
+layout: post
+title: I Moved Addumb.com into AWS
+date: 2013-03-18 08:27:14.000000000 -07:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>I decided that I should put my website in the same place I'm supposed to be putting things for work. Every web-oriented SysAdmin (or Systems Engineer, or "DevOp") these days deals with AWS or its competitors (hopefully a bit of a couple providers). I took the plunge yesterday and finally terminated my account with <strong>Yahoo! Web Hosting</strong>. Yes, that's right. I had been kind of embarrased by it, but hey, it worked OK. In fact, my new setup is going to work <em>much much worse</em> in terms of reliability and performance.</p>
+<h1>Before</h1>
+<p>The setup for addumb.com is really simple. I don't want to have to deal with it daily, weekly, nor even monthly. Here's how I had various services split up while hosted in Yahoo!.</p>
+<ul>
+<li><span style="line-height:14px;"><strong>DNS</strong>: Registered and hosted through Yahoo!.</span></li>
+<li><strong>Email</strong>: MX records pointing to Google Apps for Domains.</li>
+<li><strong>HTTP</strong>/web: Yahoo! Web Hosting. A static mini site plus a Wordpress "plugin" through Y!WH.</li>
+<li>Everything else: hosted on my home desktop with a few port forwards poked through my router.</li>
+</ul>
+<h1>After</h1>
+<p>The new setup for addumb.com is like this:</p>
+<ul>
+<li><span style="line-height:14px;"><strong>DNS registrar</strong>: namecheap.com because, well, they're cheap.</span></li>
+<li><strong>DNS hosting</strong>: Amazon Route 53.</li>
+<li><strong>Email</strong>: MX records just like before, pointing to Google Apps for Domains because it remains awesome and is what everybody should do (qualifiers galore).</li>
+<li><strong>HTTP</strong>/web: a <strong>single</strong> EC2 instance. This is a <em><strong>terrible idea</strong></em>.</li>
+<li>Everything else: a playground in AWS.</li>
+</ul>
+<h1>The Real Reason</h1>
+<p>The real reason I moved my tiny site is so that I can get more flexibility. The "Everything else" in the lists above are really the only reason I even have <em>addumb.com</em>. I spend a fair amount of time learning new application stacks, familiarizing myself with each one's development and deployment patterns. I mostly do this because I'm a nerd and it's <strong>fun.</strong> Also so that I'm not completely lost when Developer X approaches me to deploy Application Y on technology stack Z this afternoon. I need to know what questions to ask, what jargon to use, and how to communicate the needs of performance, reliability and cost.</p>
+<p>I'm self-hosting addumb.com sort of similar to how I would recommend hosting any new web property that has similar needs. My needs are just very different than most consumer web properties.</p>
+<h1>I'm a Cheapskate</h1>
+<p>So why on earth would I put all of addumb.com on a single EC2 instance, let alone one with only ephemeral storage?! Just like any web property, I have certain targets in cost, reliability and performance:<br />
+<a href="{{ site.baseurl }}/assets/tradeoff1.png"><img alt="fast/cheap/available tradeoff" src="{{ site.baseurl }}/assets/tradeoff1.png" /></a></p>
+<p>But my personal web site is very different than a real business. Most people end up in the blue area here, but you can see where I pick in the trade-offs:<br />
+<a href="{{ site.baseurl }}/assets/heapskate.png"><img alt="cheap sonofabitch" src="{{ site.baseurl }}/assets/cheapskate.png" /></a></p>
+<p>(pardon the <a title="keming" href="http://fuckyeahkeming.com/" target="_blank">kerning</a>) A direct result of me being a cheapskate is that my website will be slower and down more often than most websites you'll see. However, I saved a bundle on my hosting costs! $10/mo versus $20/mo! That's like an extra latte <em>each week!</em></p>
+<h1>Damage Control</h1>
+<p>To help make this less of a <em><strong>terrible idea</strong></em>, I'm putting the whole site in some git repos and hooking as many things as possible into the post-receive hook in the git repos on the EC2 instance(s). Basically, I force a puppet run for every git push, and try to make that puppet run deal with all the important things, as you can kiiiinda see here.</p>
+<pre>#!/bin/bash
+#.git/hooks/post-receive example
+unset GIT_DIR
+cd ..
+git reset --hard HEAD
+sudo puppet apply --modulepath puppet/modules puppet/init.pp
+#puppet/init.pp
+node default {
+  include nginx
+  include flask
+  file { ['/var/www','/var/www/html']:
+    ensure =&gt; directory,
+    owner  =&gt; root,
+    group  =&gt; root,
+    mode   =&gt; 1766
+  }
+  exec {'rsync-of-failure':
+    command =&gt; '/usr/bin/sudo /usr/bin/rsync -a --delete webroot/* /var/www/html/',
+    require =&gt; File['/var/www/html']
+  }
+}</pre>
+<p>Note: See that last exec? Don't ever do that. I'm being sloppy and only hurting myself.</p>
+<h1>Don't Try This At Home</h1>
+<p>Nobody should jump to any solution for any technical problem without fully understanding (or making a reasonable attempt to understand) the tradeoffs involved and other viable solutions. The increase in flexibility I get from self-hosting (in AWS or some other provider) outweigh the slight increase in cost and decrease in availability and performance for my own website. Mostly because it doesn't matter to anybody but myself. I mean come on, nobody else is even READING this, right?</p>

@@ -1,0 +1,71 @@
+---
+layout: post
+title: 'Updated: MySQL 5.0 and 5.1 Side-By-Side'
+date: 2011-03-02 10:32:17.000000000 -08:00
+type: post
+published: true
+status: publish
+categories:
+- Tech
+- Tip
+tags:
+- MySQL
+- Tech
+- tip
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>Cross-posted from <a href="http://devblog.meebo.com" target="_blank">http://devblog.meebo.com</a>.</p>
+<p>As part of working on the Meebo Operations team, I manage a bunch of database servers at Meebo. You may remember Dave's post a couple months ago about how we're starting to use NoSQL technologies for data storage. Though CouchDB and Cassandra are more new and exciting, Meebo still relies heavily upon MySQL for much of our infrastructure.</p>
+<p>56 of the ~160 DB servers I manage are running MySQL, for now. A lot of those are running an old version of MySQL: 5.0.77. The version is old mostly because it's the default provided by our Linux distribution of choice, CentOS. I’ve been in the process of upgrading to something slightly less ancient (a "non-stock" version of MySQL 5.1 built and maintained by Percona, available here) for about a year. It’s slow-going, though, mostly because the servers aren't catching fire by staying on 5.0.77, so it’s lower in my priorities.</p>
+<p>A couple months ago, I split out one of our highest traffic databases onto a pair of servers running MySQL 5.1. Thing is, I set up multi-headed MySQL servers running multiple MySQL processes on the same machine. As of this writing, we have 120 MySQL  processes running on the 56 machines. This high-traffic app had a remote replica on one of these multi-headed servers. So, I had two 5.1 servers trying to replicate to a 5.0 server using an incompatible protocol. How is that possible, you ask? Well I made a mistake. When I set up the new pair of servers, I spaced and made them use a non-backwards-compatible replication protocol, Row-Based Replication.  That meant I had to upgrade part of the multi-headed server to 5.1! Uh oh!</p>
+<p>I had sort of done this in the past, but never in a live, production environment. Based on past experience, I knew the steps were something like this:</p>
+<p>1) Install the package(s) to a different location:<br />
+<code><br />
+mkdir /opt/mysql51<br />
+rpm --relocate /usr/=/opt/mysql51/ -i --nodeps Percona-Server*.rpm<br />
+</code><br />
+Note: you may run into a problem with the /etc/my.cnf file. I recommend moving it somewhere safe so nothing clobbers it.</p>
+<p>2) Make sure you specify which mysqladmin and mysqld to use in /etc/my.cnf, otherwise the "default" ones will always be used, in my case those were the 5.0.77 binaries.</p>
+<p>3) This is the one that really killed me: specify the full path to the new language file you want in your configuration file (usually /etc/my.cnf on RedHatty systems)<br />
+<code><br />
+language=/opt/mysql51/share/mysql/english<br />
+</code><br />
+Running two versions of MySQL side-by-side is neat and all, but it's pretty difficult to manage if you can't leverage existing tools like the SysVinit script, or even mysqld_multi. mysqld_multi is the recommended way to manage multi-headed database servers. It doesn't come with an init script, but it's pretty easy to create a "Meh, it kinda works" one based on a Fedora example init script. As for mysqld_multi, it's really not that difficult to set it up to manage any version of MySQL, so long as the RPMs were installed to non-conflicting locations. Here's my example /etc/my.cnf file:<br />
+<code><br />
+[mysqld1]<br />
+language=/opt/mysql51/share/mysql/english<br />
+mysqld=/opt/mysql51/sbin/mysqld<br />
+mysqladmin=/opt/mysql51/bin/mysqladmin<br />
+datadir=/var/lib/mysql51<br />
+socket=/var/run/mysqld/51.sock<br />
+pid-file=/var/run/mysqld/51.pid<br />
+log-error=/var/log/mysqld-51.log<br />
+port=3306</p>
+<p>[mysqld2]<br />
+language=/usr/share/mysql/english<br />
+mysqld=/usr/libexec/mysqld<br />
+mysqladmin=/usr/bin/mysqladmin<br />
+datadir=/var/lib/mysql50<br />
+socket=/var/run/mysqld/50.sock<br />
+pid-file=/var/run/mysqld/50.pid<br />
+log-error=/var/log/mysqld-50.log<br />
+port=3307</p>
+<p>[mysqld_multi]<br />
+log=/var/log/mysqld.log</p>
+<p>[mysqld_safe]<br />
+log-error=/var/log/mysqld.log<br />
+pid-file=/var/run/mysqld/mysqld.pid<br />
+</code><br />
+Note that  I'm using the format for mysqld_multi, not for a regular single-process setup. Also note that these parameters are the absolute minimum to get mysqld_multi to start the processes. It is always required to tune MySQL the rest of the way. This typically ends up being many duplicated lines in /etc/my.cnf specifying the InnoDB buffer pool size, the thread concurrency limits of infinity, etc. Also be careful not to use non-backward-compatible configuration parameters in the 5.0.x section!</p>
+<p>In order to get the processes to start, you need to run mysql_install_db, but you need to use different versions, so watch out! Here's how I did that:</p>
+<p>1) For the 5.0 version, since that's the package installed to the default location, I can just run this: <code>mysql_install_db --datadir=/var/lib/mysql50 --basedir=/usr</code></p>
+<p>2) For the 5.1 version, I need to specify the other path: <code>/opt/mysql51/bin/mysql_install_db --datadir=/var/lib/mysql51 --basedir=/opt/mysql51</code></p>
+<p>3) Finally, start the processes: <code>mysqld_multi start</code></p>
+<p>Once the processes start happily, I can then start, stop and check the status of the MySQL processes, regardless of version.</p>
+<p>There you are! You can now run any version of MySQL you like side-by-side with existing legacy processes. I did this out of necessity, but realized how much it can help with my ongoing upgrade to 5.1. This gives you the option to do the MySQL 5.0 to 5.1 upgrade almost in-place, so long as your server can handle the extra load of a command like this: <code>mysqldump -S /var/run/mysqld/5.0.sock --all-databases | mysql -S /var/run/mysqld/5.1.sock</code> I could even write a migration daemon that goes around our MySQL servers to upgrade them all... if I didn't know what was good for me.</p>
+<p>-Adam</p>

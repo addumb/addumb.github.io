@@ -1,0 +1,38 @@
+---
+layout: post
+title: Devops
+date: 2009-11-25 13:56:25.000000000 -08:00
+type: post
+published: true
+status: publish
+categories:
+- Tech
+tags:
+- Tech
+author:
+  login: addumb
+  email: adam@addumb.com
+  display_name: addumb
+  first_name: ''
+  last_name: ''
+---
+<p>Sysadmins: trust devs. They are hired because they are very good at what they do. They don't want to reboot your servers and overload them.</p>
+<p>Devs: trust sysadmins. They are hired because they are very good at what they do. They don't want to under-resource your apps and block off access to your apps.</p>
+<p>Let's all just get along. There are some housekeeping requirements though. There must be an accountability chain as well as an audit trail of changes made on production systems. There must also be quick and easy access to details about hardware, apps, network, basically anythig you can catalog. Very important questions like these should be trivial to answer:</p>
+<ul>
+<li>What switch are these servers connected to?</li>
+<li>What version of this package should be installed where?</li>
+<li>What is this IP?</li>
+<li>What is this hostname?</li>
+</ul>
+<p>Each should be answered with way more information than seems sane. Leave it to meatspace to make sense of it.</p>
+<p>Some ideas...</p>
+<p>How should you give access to and accountability on production systems and maintain a secure audit trail? A simple starting point is to hook up production with a read copy of your corporate directory, allow dev and ops to login and have sudo. Yes, root shell in production. Nobody <em>wants</em> to break things, but if somebody really is incompetent, they should be trained, not gated off. Be sure to set up auditd to track filesystem writes by devs and ops as well as access to other accounts (all <strong><em>sudo </em></strong>and <strong><em>su </em></strong>usage). Tracking privileged port socket creation may be good, too. Make daily/weekly/monthly reports as well as realtime alerting for big ohshits like root login, exec of important binaries, rm of special files, the usual Security Relevant Objects stuff.<br />
+Aside from shell access, everybody should be able to deploy, revert, and stage new code at any time. There are many many ways to do this. I hear flickr uses an internal web app that has a big red button. Be sure the button reverts ALL changes: all code, packages, daemons, db alters, switch/loadbalancer config,... EVERYTHING. Stuff broke, so change it back NOW!</p>
+<p>An important part of minimizing the impact of "shit breaking" is resource isolation. If something fails it should fail completely independently. Just because resource usage scales 1:1 between two apps, or because the localhost latency will improve performance, or even because something is usually well-behaved do not let the two apps share resources if one going down can have only limited impact on the other. For example, if your main app requires a daemon for db connection pooling, serialization, or some message queue and can operate in any way without that daemon (with degraded features), then think twice (or ten times) before putting the two on the same server. There are tools to minimize the correlated performance hit like <em><strong>rlimit </strong></em>and <strong><em>chroot</em></strong>, or even virtualization. Sometimes these will get you close enough to independent failures.</p>
+<p>How do I get any and all info without impacting performance of production hardware? You don't. It's a requirement that is built into hardware scaling considerations, just like monitoring. Of course, always try to find the least invasive method. Some ideas:</p>
+<ul>
+<li>Crawl switch mac tables to correlate servers and switch ports. Often if you do a lot of wire fanagaling.</li>
+<li>Use a pre-made daily report about packages installed (CentOS has <em>/var/log/rpm</em> made from <em>/etc/cron.daily/rpm</em>).</li>
+<li>Write many small and simple tools to make the info accessible everywhere at any time.</li>
+</ul>
