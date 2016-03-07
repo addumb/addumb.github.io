@@ -2,6 +2,7 @@
 layout: post
 title: Linux tip 3 - rsync gotchas
 date: 2009-10-21 18:46:35.000000000 -07:00
+permalink: /2009/10/21/n00b-tip-3-rsync-gotchas/
 type: post
 published: true
 status: publish
