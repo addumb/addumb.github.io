@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Two sample z test between percents</title>
+<script>
+function gitit() {
+    var p1 = parseFloat(document.forms[0].p1.value);
+    var n1 = parseFloat(document.forms[0].n1.value);
+    var p2 = parseFloat(document.forms[0].p2.value);
+    var n2 = parseFloat(document.forms[0].n2.value);
+    //z = (p1 - p2)/SD
+    //SD = sqrt((p*(1-p)/n1) + (p*(1-p)/n2))
+    p = (n1*p1 + n2*p2)/(n1+n2);
+    SD = Math.sqrt((p*(1-p)/n1) + (p*(1-p)/n2));
+    z = (p1 - p2)/SD;
+    document.getElementById("z").innerHTML = z;
+    P = doLeft(-z);
+    document.getElementById("P").innerHTML = 2*P;
+    if(P<0.001) {
+        document.getElementById("significant").innerHTML = "Significant at ***";
+    } else if (P<0.01) {
+        document.getElementById("significant").innerHTML = "Significant at **";
+    } else if (P<0.05) {
+        document.getElementById("significant").innerHTML = "Significant at *";
+    } else {
+        document.getElementById("significant").innerHTML = "NOT significant";
+    }
+    return false;
+}
+function doLeft(z) {
+    if(z<-6.5) return 0;
+    if(z>6.5) return 1;
+
+    factK=1;
+    sum=0;
+    itts=0;term=1;k=0;
+    while(Math.abs(term)>Math.exp(-23)) {
+        term=.3989422804*Math.pow(-1,k)*Math.pow(z,k)/(2*k+1)/Math.pow(2,k)*Math.pow(z,k+1)/factK;
+        sum+=term;
+        k++;
+        factK*=k;
+
+    }
+    sum+=1/2;//alert(sum)
+    if(sum<.0000000001) sum=0;
+
+    return sum;
+}
+</script>
+</head>
+<body>
+<h2>Two sample Z test for percentages or proportions</h2>
+Hint: use the "0.8" form instead of "80" for the %
+<form name="form" onsubmit="return gitit();">
+p1: <input type="text" name="p1"/><br/>
+n1: <input type="text" name="n1"/><br/>
+p2: <input type="text" name="p2"/><br/>
+n2: <input type="text" name="n2"/><br/>
+<input type="submit" value="DO EET!"/><br/>
+z is <span id="z"></span><br/>
+P is <span id="P"></span><br/>
+<span id="significant">Significance?</span>
+</form>
+</body>
+</html>
