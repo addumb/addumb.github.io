@@ -5,5 +5,4 @@ exclude: ["vendor", "lib", "Capfile", "Gemfile", "config", "log", "tmp", "CNAME"
 destination: public
 description: Addumb.com. It's just a crappy personal site. nbd. Move along.
 permalink: /:year/:month/:day/:title/
-gems:
- - jekyll-sitemap
+url: http://addumb.com
