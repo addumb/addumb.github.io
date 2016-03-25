@@ -1,5 +1,9 @@
 lsi: false
-hilighter: rogue
+highlighter: rogue
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
 source: .
 exclude: ["vendor", "lib", "Capfile", "Gemfile", "config", "log", "tmp", "CNAME", "README.md"]
 destination: public
