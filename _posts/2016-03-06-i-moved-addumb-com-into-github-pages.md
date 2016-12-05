@@ -82,7 +82,7 @@ Then the `_includes` are just your site template pieces, `_layouts` just has a d
 You should be able to run this to get your jekyll site running locally:
 
 ```
-bundle exec serve
+$ bundle exec jekyll serve
 ```
 
 ## The Wordpress.com Import Stuff
