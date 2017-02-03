@@ -23,7 +23,7 @@ It was kind of fun :) Believe it or not, I actually have a couple other pages un
 
  - [/posts](/posts)
  - [my résumé](/resume.html)
- - [my rÃ©sumÃ©](/rÃ©sumÃ©.html)
+ - my rÃ©sumÃ© (but I have since removed it because Github Pages doesn't like it for some reason.
  - [some social science statistic calculator](/derp.html)
  - [a NATO phonetic alphabet spitter-outer](/nato-phonetic-alphabet-tool.html)
 
