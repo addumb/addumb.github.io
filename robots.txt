@@ -1,0 +1,5 @@
+---
+sitemap: true
+permalink: /robots.txt
+---
+Sitemap: http://addumb.com/sitemap.xml
