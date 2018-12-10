@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>I just want a fucking gift exchange name shuffler</title>
+    <script>
+    // ROTFL this is so horrible. Whatever.
+      function shufflethefuckingnames() {
+        var result = document.createElement("ol");
+        var names = [].slice
+          .call(document.querySelectorAll("input"))
+          .flatMap(function(e) {
+            return e.value;
+          });
+        let uniqueNames = [...new Set(names)];
+        console.log(
+          "name: " + names.length + ", uniqueNames: " + uniqueNames.length
+        );
+        if (names.length > uniqueNames.length) {
+          var sass = document.createElement("li");
+          sass.innerHTML =
+            "You're an idiot. Use unique names for christ' sake.";
+          result.appendChild(sass);
+        }
+        var givers = uniqueNames.slice(0);
+        var getters = uniqueNames.slice(0);
+        givers.forEach(function(n1) {
+          n2 = n1;
+          var idx2 = 0;
+          if (getters.length == 2) {
+            var myidx = getters.indexOf(n1);
+            if (myidx != -1) {
+              idx2 = (myidx + 1) % 2;
+              n2 = getters[idx2];
+            }
+          } else if (getters.length == 1) {
+            idx2 = 0;
+            n2 = getters[idx2];
+          }
+          while (n2 == n1 && getters.length > 1) {
+            idx2 = Math.floor(Math.random() * getters.length);
+            n2 = getters[idx2];
+          }
+          var gettersleft = getters.slice(0, idx2);
+          var gettersright = getters.slice(idx2 + 1);
+          getters = gettersleft.concat(gettersright);
+          var newnameli = document.createElement("li");
+          newnameli.innerHTML = n1 + " has " + n2;
+          result.appendChild(newnameli);
+        });
+        document.getElementById("results").innerHTML = "";
+        document.getElementById("results").appendChild(result);
+      }
+      function morenames() {
+        var newnameli = document.createElement("li");
+        var newnamelabel = document.createElement("label");
+        newnamelabel.innerHTML = "Name: ";
+        var newname = document.createElement("input");
+        newname.type = "text";
+        newnamelabel.appendChild(newname);
+        newnameli.appendChild(newnamelabel);
+        document.getElementById("names").appendChild(newnameli);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>I just want a fucking gift exchange name shuffler</h1>
+    <ul id="names">
+      <li>
+        <label>Name: <input type="text" value="Little Cindy Lou"/></label>
+      </li>
+      <li>
+        <label>Name: <input type="text" value="Max"/></label>
+      </li>
+      <li>
+        <label>Name: <input type="text" value="Grinch"/></label>
+      </li>
+    </ul>
+    <button onclick="morenames()">
+      More names, goddammit! I don't have some tiny shit family, idiot.
+    </button>
+    <button onclick="shufflethefuckingnames()">
+      Just shuffle the fucking names into pairs.
+    </button>
+    <div id="results"></div>
+  </body>
+</html>
