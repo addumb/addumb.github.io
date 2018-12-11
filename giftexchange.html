@@ -4,7 +4,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>I just want a fucking gift exchange name shuffler</title>
     <script>
-      // ROTFL this is so horrible. Whatever.
+      // ROTFL this whole thing is so horrible. Whatever.
+      function remove(arr, me) {
+        return arr.filter(e => e !== me);
+      }
       function shufflethefuckingnames() {
         var result = document.createElement("ol");
         var names = [].slice
@@ -13,9 +16,6 @@
             return e.value;
           });
         let uniqueNames = [...new Set(names)];
-        console.log(
-          "name: " + names.length + ", uniqueNames: " + uniqueNames.length
-        );
         if (names.length > uniqueNames.length) {
           var sass = document.createElement("li");
           sass.innerHTML =
@@ -24,28 +24,22 @@
         }
         var givers = uniqueNames.slice(0);
         var getters = uniqueNames.slice(0);
-        givers.forEach(function(n1) {
-          n2 = n1;
-          var idx2 = 0;
-          if (getters.length == 2) {
-            var myidx = getters.indexOf(n1);
-            if (myidx != -1) {
-              idx2 = (myidx + 1) % 2;
-              n2 = getters[idx2];
-            }
-          } else if (getters.length == 1) {
-            idx2 = 0;
-            n2 = getters[idx2];
+        givers.forEach(function(giver) {
+          var candidates = remove(getters.slice(0), giver);
+          var giveridx = givers.indexOf(giver);
+          var getteridx;
+          if (
+            candidates.length == 2 &&
+            givers.indexOf(candidates[0]) < giveridx
+          ) {
+            getteridx = 1;
+          } else {
+            getteridx = Math.floor(Math.random() * candidates.length);
           }
-          while (n2 == n1 && getters.length > 1) {
-            idx2 = Math.floor(Math.random() * getters.length);
-            n2 = getters[idx2];
-          }
-          var gettersleft = getters.slice(0, idx2);
-          var gettersright = getters.slice(idx2 + 1);
-          getters = gettersleft.concat(gettersright);
+          var getter = candidates[getteridx];
+          getters = remove(getters, getter);
           var newnameli = document.createElement("li");
-          newnameli.innerHTML = n1 + " has " + n2;
+          newnameli.innerHTML = giver + " has " + getter;
           result.appendChild(newnameli);
         });
         document.getElementById("results").innerHTML = "";
