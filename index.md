@@ -15,5 +15,5 @@ Oh hey! I have some stupid stuff for you on the internets I don't actually do an
 
 Here are some posts maybe?
 {% for post in site.posts %}
- * [{{ post.title }}]({{ post.url }})
+ * [{{ post.title }}]({{ post.url }}) ({{post.date | date: "%Y-%-m-%-d"}})
 {% endfor %}
