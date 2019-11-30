@@ -1,0 +1,22 @@
+---
+layout: default
+title: Addumb.com
+description: Adam Gray, Systems and software engineer, nerd, bad musician, better friend, good driver.
+---
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            {% include sidebar.html %}
+        </div>
+        <div class="col-lg-8">
+            {% for post in site.posts limit: 4 %}
+            <div>
+                <h1>{{post.title}}</h1>
+                <p class="sub-heading"> {{ post.date | date: '%B %d, %Y' }}</p>
+                {{ post.content }}
+                <hr />
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

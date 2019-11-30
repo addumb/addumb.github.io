@@ -3,6 +3,8 @@ layout: post
 title: Linux tip 3 - rsync gotchas
 date: 2009-10-21 18:46:35.000000000 -07:00
 permalink: /2009/10/21/n00b-tip-3-rsync-gotchas/
+description: rsync trailing slashes are tricky. Always use them for existing directories, always omit them to create new ones at the destination.
+keywords: rsync, rsync directory, rsync slash
 type: post
 published: true
 status: publish
@@ -17,6 +19,8 @@ author:
   first_name: ''
   last_name: ''
 ---
+description: rsync trailing slashes are tricky. Always use them for existing directories, always omit them to create new ones at the destination.
+
 Use rsync a lot? Do you use it just infrequently enough to have to check the man page every time? Me too. I always have trouble with out it interprets trailing slashes on paths.
 
  * Copy entire directory to remote parent directory:

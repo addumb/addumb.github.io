@@ -5,13 +5,13 @@
   {% include header.html %}
   <div class="container">
     <div class="row">
-      <div class="col-lg-8">
-        <h1> {{ page.title }}</h1>
-	      <p class="sub-heading">{{ page.date | date: '%B %d, %Y' }} by {{ page.author.first_name }}</p>
-        {{ content }}
-      </div>
       <div class="col-md-4">
         {% include sidebar.html %}
+      </div>
+      <div class="col-lg-8">
+        <h1> {{ page.title }}</h1>
+        <p class="sub-heading">{{ page.date | date: '%B %d, %Y' }}</p>
+        {{ content }}
       </div>
     </div>
   </div>
