@@ -7,6 +7,8 @@ kramdown:
 source: .
 exclude: ["vendor", "lib", "Capfile", "Gemfile", "config", "log", "tmp", "CNAME", "README.md"]
 destination: public
+plugins:
+    - jekyll-feed
 description: Addumb.com. It's just a crappy personal site. nbd. Move along.
 permalink: /:year/:month/:day/:title/
 url: http://addumb.com
