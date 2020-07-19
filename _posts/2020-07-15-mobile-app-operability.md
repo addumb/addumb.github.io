@@ -11,12 +11,6 @@ categories:
 - Tech
 tags:
 - Tech
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: 'Adam'
-  last_name: 'Gray'
 ---
 
 Mobile apps often get a bad rep from backend infrastructure people. Rightly so when comparing operability between backend infrastructure services and mobile applications. First, so that we're on the same page: operability is trait of a software system which makes detection,  remediation, and anticipation of errors is low-effort. What is this for mobile applications? Well... it's the trait of a mobile application which makes detection, remediation, and anticipation of errors is low-effort, of course. Mobile apps are software systems. They're usually best modeled as trivially parallelized distributed software systems which just happen to run on mobile devices rather than on owned infrastructure.

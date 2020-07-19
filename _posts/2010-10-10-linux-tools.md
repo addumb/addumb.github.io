@@ -8,12 +8,6 @@ status: publish
 categories:
 - Tech
 tags: []
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: ''
-  last_name: ''
 ---
 [http://github.com/addumb/tools](http://github.com/addumb/tools)
 

@@ -12,12 +12,6 @@ categories:
 - Tech
 - Tip
 tags: []
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: ''
-  last_name: ''
 ---
 description: rsync trailing slashes are tricky. Always use them for existing directories, always omit them to create new ones at the destination.
 

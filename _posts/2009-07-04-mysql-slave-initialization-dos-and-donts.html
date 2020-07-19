@@ -11,12 +11,6 @@ tags:
 - MySQL
 - SysAdmin
 - Tech
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: Adam
-  last_name: ''
 ---
 <p>This assumes you know how to set up a MySQL slave server. Go <a href="http://dev.mysql.com/doc/refman/5.1/en/replication.html" target="_blank">here</a> if you don't already know and <a href="http://www.reddit.com" target="_blank">here</a> if you don't care. Everybody needs slaves for their MySQL database instances. A slave copies data-changing DB queries on to another server that attempts to keep up. You can abuse the slaves all you want: run backups, do ad-hoc (non-production) queries, failover, alter, promote... whatever. The wins for having MySQL slaves pretty greatly outweigh the extra costs (hardware, power, Sys Admin time) for most critical databases.</p>
 <p>So, how do you set up a new slave? Ideally, you deploy the slave when you deploy the master, but that takes foresight not everybody has. Sometimes, you need to make a new slave if you're migrating the master to new hardware. Ima go over the 2nd case.</p>

@@ -9,12 +9,6 @@ categories:
 - Tech
 - Tip
 tags: []
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: ''
-  last_name: ''
 ---
 What does this line of bash output (and where?):
 {% highlight bash %}

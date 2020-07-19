@@ -8,12 +8,6 @@ published: true
 status: publish
 categories: []
 tags: []
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: ''
-  last_name: ''
 ---
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 

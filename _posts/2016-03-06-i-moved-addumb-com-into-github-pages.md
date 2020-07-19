@@ -12,12 +12,6 @@ categories:
 - Tip
 tags:
 - Tech
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: 'Adam'
-  last_name: 'Gray'
 ---
 It was kind of fun :) Believe it or not, I actually have a couple other pages under addumb.com aside from shitty blog posts:
 

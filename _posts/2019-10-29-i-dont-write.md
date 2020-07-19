@@ -11,12 +11,6 @@ categories:
 - Tech
 tags:
 - Tech
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: 'Adam'
-  last_name: 'Gray'
 ---
 I don’t write, and I often get feedback that it’s hurting my career in software engineering.
 

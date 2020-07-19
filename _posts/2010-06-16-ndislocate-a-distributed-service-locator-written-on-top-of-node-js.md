@@ -8,12 +8,6 @@ published: true
 status: publish
 categories: []
 tags: []
-author:
-  login: addumb
-  email: adam@addumb.com
-  display_name: addumb
-  first_name: ''
-  last_name: ''
 ---
 [http://github.com/pquerna/ndislocate](http://github.com/pquerna/ndislocate)
 
