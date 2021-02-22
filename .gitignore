@@ -4,3 +4,4 @@ Gemfile
 Gemfile.lock
 public
 .ruby-version
+.jekyll-cache
