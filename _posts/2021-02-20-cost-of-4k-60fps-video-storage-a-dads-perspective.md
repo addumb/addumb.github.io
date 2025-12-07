@@ -4,9 +4,9 @@ title: The Cost of 4K 60fps video storage, a dad's perspective
 date: 2021-02-20 00:00:00.000000000 -07:00
 type: post
 published: true
-status: draft
-description: TBD
-keywords: TBD
+status: publish
+description: Recording 4k 60fps iPhone videos costs nearly nothing for an individual
+keywords: 
 categories:
 - Tech
 tags:
