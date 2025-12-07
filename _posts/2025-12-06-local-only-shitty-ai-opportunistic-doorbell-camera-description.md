@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "My Local-only shitty AI opportunistic doorbell camera explainer explainer"
-date: 2026-12-06 10:00:00 -0500
+title: My Local-only shitty AI opportunistic doorbell camera explainer explainer
+date: 2025-12-06 10:00:00 -0500
 type: post
-published: false
-status: draft
+published: true
+status: publish
 description: Self-hosted low-end AI (high-end gaming GPU) to give some laughs
+keywords: 
 categories:
 - self-hosted
 - AI
@@ -18,15 +19,17 @@ tags:
 - home-assistant
 - fun
 ---
-# My Local-only shitty AI opportunistic doorbell camera explainer explainer
-
+{%- raw %}
 tl; dr: For today at least, I use Home Assistant's HACS integrations for vivint (my home security system), ollama-vision (I don't know wtf this means), and my *Windows* gaming PC which has an RTX 5080 (16GB VRAM) to give a slow, inaccurate, and unreliable description of who or what is at my front door based on AI magicks'ing my doorbell camera. It takes around 3 seconds usually, sometimes far less (600ms) and sometimes far more (6 fucking minutes). But it is 100% completely self-hosted and bereft of subscription fees, though thus wildly unreliable.
 
 Amend this classic image:
-![somebody at my front door](/assets/home-assistant-doorbell-mailman.jpg)
+![somebody at my front door](/assets/home-assistant-doorbell-mailman.jpg){: width="250" }
 
 With a follow-up notification describing them:
-![OMG, it's the mail dude! He's got a big ol' mail bag on his back and he's tryin' to get the mail in the box. He's wearin' a blue postal uniform with a white hat and REDACTD that's like totally on point. He's got REDACTED](/assets/home-assistant-doorbell-text.jpg)
+![OMG, it's the mail dude! He's got a big ol' mail bag on his back and he's tryin' to get the mail in the box. He's wearin' a blue postal uniform with a white hat and REDACTD that's like totally on point. He's got REDACTED](/assets/home-assistant-doorbell-text.jpg){: width="250" }
+
+
+While **100% self-hosted on your own network** on mostly open source stuff. On Linux the closed-source NVIDIA drivers are required for ollama to be useful.
 
 I don't know what MCP is, I don't know what "local inference" means and I don't give a shit and that's my problem professionally, but not personally. I want shitty automated jokes about people at my door delivered to my phone within a few mintues maybe. I don't know in any detail what `llama3.2-vision` means and how it compares to anything else listed on ollama models lists. I'm not a luddite, I'm just a human bean and not super excited about techno-fascists sending obviated labor to prisions via a few trivial intermediate steps.
 
@@ -58,19 +61,25 @@ I don't give a shit, if you're here you already have one because you're me and n
 Get over it, you know I'm right. If I'm not then congrats on your retirement.
 
 ## Self-Hosted GPU for Home Assistant ollama-vision summary of your doorbell camera
-i.e. the point of this post, why did I write other shit? What and idiot.
+i.e. the point of this post, why did I write other shit? What an idiot.
 
 ***First:*** [Download ollama](https://ollama.com/) onto your gaming PC. Play around with it. It's fun. Try to make it swear, try to make it say "boner" and all that. Have your fun.
 
-Try out a "vision model." I don't know what that means other than I can supply an image URL from wikipedia or wherever and ask it to describe the iamge and it does. I can ask it to make fun of the image and it mostly does. I tried "llama3.2-vision" because 1) it says "vision", and 2) "ollama" shares a lot of in-sequence letters with "llama" so I suppose they're kind of thematically related (yes, I get that my employer, Meta, made LLAMA but that's honestly all I understand as the similarity).
+Try out a "vision model." I don't know what that means other than I can supply an image URL from wikipedia or wherever and ask it to describe the image and it does. I can ask it to make fun of the image and it mostly does. I tried "llama3.2-vision" because 1) it says "vision", and 2) "ollama" shares a lot of in-sequence letters with "llama" so I suppose they're kind of thematically related (yes, I get that my employer, Meta, made LLAMA but that's honestly all I understand as the similarity).
 
-***Second:*** Try out the [Home Assistant integration for ollama](https://www.home-assistant.io/integrations/ollama/) pointing back to your Windows PC. Run it with this command in a terminal (PowerShell):
+***Second:*** Try out the [Home Assistant integration for ollama](https://www.home-assistant.io/integrations/ollama/) pointing back to your gaming PC. Run it with this command in a terminal.
+PowerShell:
 ```
 $Env:OLLAMA_HOST = "0.0.0.0:11434"; ollama serve
 ```
-Then configure the integration to point to your Windows gaming PC's IP (v4 or v6, don't give afuck, `0.0.0.0` makes it listen on all interfaces which also happens to listen on IPv6 `::` address which is fun if you're into that). Talk to it, use it as a chatbot. It works, it's not amazing, but it's yours. Use it as a "conversation agent" for HA's "Assist" instead of their own or OpenAI. Ollama is "free" as in "it's winter and my energy bill goes to heat anyway, so sure power up that RTX5080 space heater."
+bash:
+```
+OLLAMA_HOST=0.0.0.0:11434 ollama serve
+```
 
-***Third:*** Throw away the ollama integration. It was fun, but that's not why you're here. You're here to automate, not to chat. Use the [ollama_vision](https://github.com/remimikalsen/ollama_vision/) integration in HACS. And *VERY CAREFULLY* read the section on "Events": https://github.com/remimikalsen/ollama_vision/?tab=readme-ov-file#events. Point it at your gaming PC. If you don't know what model to use, neither does anybody else except for the mega fans. NOBODY ELSE CARES, folks. I picked llama3.2-vision and it works. I don't know why, but it works. I suppose it's because it says "llama" and "vision," I don't care.
+Then configure the integration to point to your gaming PC's IP. Talk to it, use it as a chatbot. It works, it's not amazing, but it's yours. Use it as a "conversation agent" for HA's "Assist" instead of their own or OpenAI. Ollama is "free" as in "it's winter and my energy bill goes to heat anyway, so sure power up that RTX 5080 space heater."
+
+***Third:*** Throw away the ollama integration. It was fun, but that's not why you're here. You're here to automate, not to chat. Use the [ollama_vision](https://github.com/remimikalsen/ollama_vision/) integration in HACS. And *VERY CAREFULLY* read the section on "Events": [https://github.com/remimikalsen/ollama_vision/?tab=readme-ov-file#events](https://github.com/remimikalsen/ollama_vision/?tab=readme-ov-file#events). Point it at your gaming PC. If you don't know what model to use, neither does anybody else except for the mega fans. NOBODY ELSE CARES, folks. I picked llama3.2-vision and it works. I don't know why, but it works. I suppose it's because it says "llama" and "vision?" I don't care.
 
 ***Fourth:*** Create an automation to *manually* send a [Wikipedia hotdog image](https://en.wikipedia.org/wiki/Hot_dog#/media/File:Hot_dog_with_mustard.png) to ollama-vision when you *manually* force the automation to run. Play with it. Change the URL around a lot. Try the not-a-hotdog thing, whatever. Get this working first. In order to do so, you'll need 4 things open at once: ollama in powershell, Home Assistant automation editor, **Home Assistant event subscribing to `ollama_vision_image_analyzed`** (not obvious in any docs), and the Home Assistant logs. For the Home Assistant automation you'll want something like this for the full automation:
 ```
@@ -90,6 +99,11 @@ actions:
 
 ```
 Hint: that wikipedia hotdog URL doesn't work but https://www.w3schools.com/html/pic_trulli.jpg does and it's *not* a hot dog nor a penis.
+
+Errors I hit:
+* Home Assistant logs showed an HTTP 403 error when fetching an image by URL (like the Wikipedia hotdog image). Solution: use a different test image URL.
+* Formatting yaml is fuckin' dumb so of course everything is always wrong at first. Solution: git gud.
+* Can't see how it all hops across from manual press -> image fetch -> ollama GPU stuff -> notification. Solution: really seriously open all 4 of those things in one screen, 1/4 each.
 
 ***Fifth:*** Once you have not-a-hotdog working, you should see something in the Home Assistant event subscription UI on `ollama_vision_image_analyzed` like this:
 ```
@@ -198,7 +212,11 @@ context:
   parent_id: null
   user_id: null
 ```
-So in an automation you grab the event data and put it into a notification. Use `trigger.event.data.*` fields in conditions and message content/title:
+This is a separate animation because it can take an unpredictable amount of time ranging from 600ms to 60000ms (1 minute).
+
+In this additional automation you grab the event data and put it into a notification. Use `trigger.event.data.*` fields in conditions and message content/title:
+
+{% raw %}
 ```
 alias: notify about doorbell AI roast
 description: ""
@@ -226,3 +244,5 @@ Remember that modern AI's hallucinate all the time and so it's dangerous to rely
 Remember that you don't actually give a shit if it takes 2s versus 2 minutes to get a shitty AI generated joke about what's at your door or on your camera. The point is the laugh, not the latency. Don't pay for latency when what you want is the laugh.
 
 Do you care about what an AI describes at your camera while you're playing your game, using your GPU? No. If you do: no you don't, shut up.
+
+{% endraw %}
