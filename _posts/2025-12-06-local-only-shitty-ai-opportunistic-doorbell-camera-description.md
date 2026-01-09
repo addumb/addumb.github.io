@@ -22,11 +22,9 @@ tags:
 {%- raw %}
 tl; dr: For today at least, I use Home Assistant's HACS integrations for vivint (my home security system), ollama-vision (I don't know wtf this means), and my *Windows* gaming PC which has an RTX 5080 (16GB VRAM) to give a slow, inaccurate, and unreliable description of who or what is at my front door based on AI magicks'ing my doorbell camera. It takes around 3 seconds usually, sometimes far less (600ms) and sometimes far more (6 fucking minutes). But it is 100% completely self-hosted and bereft of subscription fees, though thus wildly unreliable.
 
-Amend this classic image:
-![somebody at my front door](/assets/home-assistant-doorbell-mailman.jpg){: width="250" }
+Send the classic "somebody is at your front door" notification, but with genAI slop trying to roast you when you get home:
 
-With a follow-up notification describing them:
-![OMG, it's the mail dude! He's got a big ol' mail bag on his back and he's tryin' to get the mail in the box. He's wearin' a blue postal uniform with a white hat and REDACTD that's like totally on point. He's got REDACTED](/assets/home-assistant-doorbell-text.jpg){: width="250" }
+![bruh, dude's just chillin' at the door, no mask, no gear, just a package, like what's the drama?](/assets/home-assistant-doorbell-roast.jpg){: width="800"}
 
 
 While **100% self-hosted on your own network** on mostly open source stuff. On Linux the closed-source NVIDIA drivers are required for ollama to be useful.
@@ -35,7 +33,7 @@ I don't know what MCP is, I don't know what "local inference" means and I don't 
 
 1. Run Home Assistant on a NUC in your closet or garage, your "MPoE." Don't think about it.
 2. Have fun gaming on a PC with a "decent" (read: great) GPU.
-3. Use your PC space heater to give some laughs.
+3. Use your PC as a space heater to give some laughs.
 
 ## Get to the point:
 I'd been considering buying an additional mini PC from my ~$1K ASUS NUC 14 Pro with 128G-fuckin-B of RAM, a ~$2K AMD Ryzen AI Max+ 395 system like the Framework Desktop due to its unified memory, giving the integrated GPU something like 72G-fuckin-B of **VRAM**. But I already have a gaming PC with which also cost me $2K, so why can't I try that paltry 16GB VRAM GPU of an RTX 5080? It works. Poorly and inaccurately, but it totally works well enough to give me a laugh instead of another headache.
@@ -49,7 +47,7 @@ The pieces, I think:
 6. Be a bit more patient, you're using your shit-ass home server and your shit-ass gaming PC's maybe-not-otherwise-utilized GPU.
 
 ##  Run Home Assistant on some rando place
-Nobody cares where just do it it's fun to make your lights turn off at bedtime. I'm not Google, figure this out on your own.
+Nobody cares where just do it. It's fun to make your lights turn off at bedtime. I'm not Google, figure this out on your own.
 
 ## Enjoy gaming on a PC
 This is increasingly difficult with hardware spread tripping myriad bugs, component costs blowing through every ceiling, and your day job also being glued to the same chair, keyboard, monitor, and mouse. It's a fuckin' drag.
@@ -181,7 +179,9 @@ This does a few things:
 4. Notify your phone with that image so you can refer to it later
 5. Huck it off to your gaming PC's ollama to hopefully maybe describe it unless you're gaming.
 
-***Seventh:*** This is actually *separately*, make another automation which listens to `ollama_vision_image_analyzed` and unpacks the `trigger.event.*` info. Again, an example of the event data itself is:
+***Seventh:*** [EDIT] This is **NOT** separately, I learned how `wait_for_trigger` in automation `actions` lists then can have a `trigger` type of `event` which lets a later action reference a template value of `wait.trigger.event`. The prior version of this said to make an additional automation to catch the response. No need.
+
+However, if you want to try it out to play with it, because this is all supposed to be fun to begin with, you'll want to unpack the response event:
 ```
 event_type: ollama_vision_image_analyzed
 data:
@@ -212,29 +212,91 @@ context:
   parent_id: null
   user_id: null
 ```
-This is a separate animation because it can take an unpredictable amount of time ranging from 600ms to 60000ms (1 minute).
 
-In this additional automation you grab the event data and put it into a notification. Use `trigger.event.data.*` fields in conditions and message content/title:
+Now that you see the event structure, you can adjust your prompt, text_prompt, and grab the final_description from the waited event plus the image URL from the camera snapshot and send a mobile notification. Remember, notification structure is like this:
+```
+  - action: notify.mobile_app_derp
+    data:
+      message: |
+        {{ wait.trigger.event.data.final_description }}
+      title: Is there a hotdog at the door?
+      data:
+        image: /local/snapshots/{{ imgname }}
+```
+
+In this additional automation you grab the event data and put it into a notification. Use `wait.trigger.event.data.*` (in a prior version of this post I didn't know about the `wait` object after `wait_for_trigger`) fields in conditions and message content/title.
+
+Here's my whole fuckin' thing, paraphrased to ask if there is a hotdog at the door:
 
 {% raw %}
 ```
-alias: notify about doorbell AI roast
+alias: Doorbell motion -> is it a HOTDOG?!
 description: ""
 triggers:
-  - event_type: ollama_vision_image_analyzed
-    trigger: event
-conditions:
+  - trigger: state
+    entity_id:
+      - binary_sensor.doorbell_motion
+    from:
+      - "off"
+      - "on"
+conditions: []
+actions:
+  - variables:
+      imgname: doorbell_{{ now().strftime("%Y%m%d_%H%M%S") }}.jpg
+  - action: camera.snapshot
+    metadata: {}
+    data:
+      filename: /config/www/snapshots/{{ imgname }}
+    target:
+      entity_id: camera.doorbell
+  - delay:
+      seconds: 1
+  - action: ollama_vision.analyze_image
+    metadata: {}
+    data:
+      prompt: >-
+        Describe any hotdogs in *EXTREME* detail, otherwise describe anything out
+        of the ordinary in the image. If there is nothing remarkable, then do
+        shut the fuck up. Image is from a doorbell camera. Mix in if there are
+        or are not any security concerns in the image (weapons, ill intent,
+        police, etc) as the image comes from my doorbell camera.
+      image_url: http://homeassistant.lan:8123/local/snapshots/{{ imgname }}
+      device_id: fuckshit
+      image_name: hotdog
+      text_prompt: >-
+        Respond always in highly informal genz/gen-alpha slang, swear a lot, and
+        be silly. Is there a goddamn hotdog or not? You 100% can roast, swear and use
+        slang. Now make this description extremely terse:
+        <description>{description}</description>. This will go in a mobile phone
+        notification, so 50 words **ABSOLUTE MAXIMUM**
+      use_text_model: true
+  - wait_for_trigger:
+      - event_type: ollama_vision_image_analyzed
+        trigger: event
+    timeout:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+    continue_on_timeout: false
   - condition: template
     value_template: |
-      {{ trigger.event.data.image_name == "hotdog" }}
-actions:
-  - data:
+      {{ wait.trigger.event.data.image_name == "hotdog" }}
+  - action: notify.mobile_app_derp
+    data:
       message: |
-        {{ trigger.event.data.final_description }}
-      title: Hotdog found on camera? News at 11.
-    action: notify.mobile_app_your_phone
+        {{ wait.trigger.event.data.final_description }}
+      title: Dorbell AI Roast?
+      data:
+        image: /local/snapshots/{{ imgname }}
 mode: single
 ```
+
+{% endraw %}
+
+Tadaaa:
+
+![idk lol, the dude's just flipping the bird, fam. prob just mad 'bout the door or sumn. camera's just chillin', doin' its thang, ain't no security threat, bruh. just a dude bein' extra. **no hotdog**](assets/home-assistant-doorbell-not-a-hotdog.png){: width="800"}
 
 ## Be patient, relax your expectations
 As cool as it seems to get a phone notification with a custom-prompted vision-llm AI bot telling you caustic or pithy quips to your phone, please rember that your wallet has been doing just fine without that for a good 100,000 fucking years.
@@ -244,5 +306,3 @@ Remember that modern AI's hallucinate all the time and so it's dangerous to rely
 Remember that you don't actually give a shit if it takes 2s versus 2 minutes to get a shitty AI generated joke about what's at your door or on your camera. The point is the laugh, not the latency. Don't pay for latency when what you want is the laugh.
 
 Do you care about what an AI describes at your camera while you're playing your game, using your GPU? No. If you do: no you don't, shut up.
-
-{% endraw %}
